@@ -68,7 +68,16 @@ tests/      # pytest suite (offline; 38 cases incl. the decision tool)
 pip install -r requirements.txt
 python -m notebooks.run_notebook   # end-to-end, writes out/decision_numbers.json
 python -m pytest tests/ -q         # 38 offline tests
+node site/verify.js                # the interactive site's JS pins match the Python baseline
 ```
+
+## Try it live
+
+The decision tool as an interactive page: **https://ma-case-file.vercel.app**
+Deployed from `site/` (Vercel; see `site/README.md` for the one-command
+redeploy). Drag the committee inputs and the verdict, the derivation, the
+zero-line, the twelve-deal book, the decay signature and the IRR waterfall
+recompute live — same closed forms as `decision/`.
 
 The break-even maths is the deliverable: it states the entry price at which the
 transaction stops working, reports the dilutive region rather than burying it,
