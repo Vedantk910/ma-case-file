@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M&amp;A Decision Case</title>
+<meta name="description" content="A twelve-deal M&amp;A book, priced one yardstick wide — buy, build, partner — with a live decision tool built on closed-form economics.">
+<meta name="theme-color" content="#000000">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+<a class="skip" href="#tool">Skip to the tool</a>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#hero">M&amp;A Decision Case</a>
+    <button class="menu-btn" id="menu" type="button" aria-expanded="false" aria-controls="links">Menu</button>
+    <nav id="links" aria-label="Sections">
+      <a href="#tool">The tool</a>
+      <a href="#build">Build log</a>
+      <a href="#defend">Defended</a>
+      <a href="#sources">Sources</a>
+      <a href="https://github.com/Vedantk910/ma-case-file">Code</a>
+      <a class="pill" href="#tool">Open the tool</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<p class="status" id="status" role="status">Loading the model.</p>
+
+<!-- Hero: dark, one number carries the argument -->
+<section class="hero dark" id="hero">
+  <p class="by">Case study by Vedant Konde: a buy decision for a twelve-deal M&amp;A book</p>
+  <h1>
+    <span class="lead">The decision is one multiple.</span>
+    <span class="big"><span id="heroCap">12.0</span>x</span>
+    <span class="tail" id="heroTail">the buy cap at 50% capture. Buy at or below it; above it, build is cheaper.</span>
+  </h1>
+  <a class="down" href="#tool">See the tool</a>
+</section>
+
+<!-- The case at a glance -->
+<section class="chapter" id="brief">
+  <div class="wrap">
+    <h2 class="reveal">The case at a glance.</h2>
+    <p class="intro">A sponsor's book of twelve public e-commerce and logistics acquisitions, 2015–2025. Three answers to one question, one yardstick.</p>
+    <dl class="brief-grid">
+      <div><dt>Client</dt><dd>Sponsor weighing twelve announced deals, $0.33B–$16B</dd></div>
+      <div><dt>Decision</dt><dd>Buy the target · build in-house · partner in · decline</dd></div>
+      <div><dt>Yardstick</dt><dd>Target-EBITDA units, against the target's own DCF value</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- Interactive tool -->
+<section class="chapter alt" id="tool">
+  <div class="wrap">
+    <h2 class="reveal sm">The decision, live.</h2>
+    <p class="intro">Drag any input. The verdict, the derivation, the zero-line, the synergy-decay
+    signature, the IRR waterfall and the whole twelve-deal book all recompute from the same closed forms in
+    <code>decision/</code> — no reload, no backend. The committee inputs are tagged
+    <span class="uni">[unverified]</span> in the repo; the maths is mine.</p>
+
+    <div class="toolgrid">
+      <form class="controls card" onsubmit="return false">
+        <h3>The committee's numbers</h3>
+        <p class="note">The client's to confirm. The tool's job is to show exactly how much each is worth.</p>
+
+        <p class="tag">The pivot — what the decision is priced on</p>
+        <div class="ctl-grid">
+          <div class="ctl wide">
+            <label for="inDeal">Deal</label>
+            <select id="inDeal"></select>
+          </div>
+          <div class="ctl">
+            <label for="inM">Entry multiple <i>m</i> <output id="oM"></output></label>
+            <input type="range" id="inM" min="4" max="14" step="0.5" value="8">
+          </div>
+          <div class="ctl">
+            <label for="inCap">Synergy capture <i>c</i> <output id="oCap"></output></label>
+            <input type="range" id="inCap" min="0" max="100" step="5" value="50">
+          </div>
+          <div class="ctl">
+            <label for="inWacc">Discount rate <output id="oWacc"></output></label>
+            <input type="range" id="inWacc" min="4" max="14" step="0.5" value="8">
+          </div>
+          <div class="ctl">
+            <label for="inLev">LBO leverage <output id="oLev"></output></label>
+            <input type="range" id="inLev" min="2" max="6" step="0.5" value="4">
+          </div>
+        </div>
+
+        <details class="more">
+          <summary>The IRR scenario gates — context, not the trigger</summary>
+          <div class="ctl-grid">
+            <div class="ctl">
+              <label for="inE">Scenario entry <output id="oE"></output></label>
+              <input type="range" id="inE" min="4" max="12" step="1" value="6">
+            </div>
+            <div class="ctl">
+              <label for="inX">Scenario exit <output id="oX"></output></label>
+              <input type="range" id="inX" min="4" max="12" step="1" value="12">
+            </div>
+            <div class="ctl">
+              <label for="inHold">Hold (yrs) <output id="oHold"></output></label>
+              <input type="range" id="inHold" min="3" max="7" step="1" value="5">
+            </div>
+            <div class="ctl">
+              <label for="inCagr">EBITDA CAGR <output id="oCagr"></output></label>
+              <input type="range" id="inCagr" min="0" max="8" step="0.5" value="5">
+            </div>
+          </div>
+        </details>
+
+        <div class="btns">
+          <button type="button" id="btnBaseline">Repo baseline</button>
+          <button type="button" id="btnRandom">Random committee scenario</button>
+        </div>
+      </form>
+
+      <div class="results">
+        <div class="verdict card">
+          <h3 class="tool-verdict" id="rec">—</h3>
+          <p class="verdict-line" id="recLine">Set the inputs to set the trigger.</p>
+          <dl class="flips">
+            <div><dt>Buy cap</dt><dd id="dCap">—</dd></div>
+            <div><dt>Alt past cap</dt><dd id="dAlt">—</dd></div>
+            <div><dt>Accretive yrs</dt><dd id="dAccYrs">—</dd></div>
+          </dl>
+          <p class="pvrow">Net PV at your entry multiple (units of 10 EBITDA) — buy <b id="pvBuy">—</b> ·
+          build <b id="pvBuild">—</b> · partner <b id="pvPar">—</b></p>
+        </div>
+
+        <div class="card">
+          <div class="ex-head">
+            <h3>How it came — the math, live</h3>
+            <p class="note">The same five lines the repo's decision page prints.</p>
+          </div>
+          <ol id="deriv">
+            <li>The value anchor: at <b id="dWacc">—</b>% WACC the target's own DCF prices at
+                <code>19.8x</code> EBITDA — <b id="dV">—</b> units on the 10-unit base.</li>
+            <li>The zero-line: year-1 accretion hits 0 at
+                <code>m*(c) = (E·conv + S·c) / (ds·r)</code> = <b id="dMStar">—</b> at your capture.</li>
+            <li>At <b id="dM">—</b>x, net PV: buy <b id="dPvBuy">—</b> · build <b id="dPvBuild">—</b> ·
+                partner <b id="dPvPar">—</b>.</li>
+            <li>The buy's edge thins to zero at the cap <b id="dCap2">—</b> — past that,
+                <b id="dAlt2">—</b> is cheaper.</li>
+            <li>So at <b id="dM2">—</b>x entry the move is <b id="dRec">—</b>; at the sector floor the deal
+                stays accretive for <b id="dAccYrs2">—</b> of 5 years.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="ex-head">
+            <h3>Buy / build / partner, per deal in the book</h3>
+            <p class="note">One row per deal, at your entry multiple and capture. Click a row to load that deal.</p>
+          </div>
+          <div class="scrollx">
+            <table id="bookTable">
+              <thead><tr><th>Deal ($B)</th><th class="n">Rec</th><th class="n">Buy cap</th><th class="n">Alt past cap</th><th class="n">PV buy</th><th class="n">PV build</th><th class="n">PV partner</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ex-head">
+            <h3>Decision surface — entry multiple × capture</h3>
+            <p class="note">In-zone cells: year-1 accretive <i>and</i> priced below your WACC-implied value. Click any cell to adopt it.</p>
+          </div>
+          <p class="surface-note" id="surfaceNote"></p>
+          <div id="surface"></div>
+          <div class="skey">
+            <span><i class="k-in"></i>In buy zone</span>
+            <span><i class="k-out"></i>Out of zone</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ex-head">
+            <h3>Synergy decay — accretive for N years, then it inverts</h3>
+            <p class="note">Per-year EPS effect at your entry multiple, the sector floor on the decay curve.</p>
+          </div>
+          <div id="decay"></div>
+          <p class="note decay-foot">At <b id="dMDecay">—</b>x the deal is accretive for
+          <b id="dDecayN">—</b> of 5 years at the sector floor — the decision input is <i>how long</i>, not just whether.</p>
+        </div>
+
+        <div class="card">
+          <div class="ex-head">
+            <h3>IRR waterfall — which gate is doing the work</h3>
+            <p class="note">Your scenario gates on the <b id="dSector">e-commerce</b> EBITDA CAGR. IRR is scale-invariant: deal size sets capacity, not return.</p>
+          </div>
+          <div class="irScen" id="irScen"></div>
+          <div id="irr"></div>
+          <p class="note irr-foot">In the expansion case, growth does <b id="irrGShare">—</b>% of the gate work —
+          the rest is a multiple re-rating the sponsor is assuming, not a business return.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Build log -->
+<section class="chapter" id="build">
+  <div class="wrap narrow">
+    <h2 class="reveal sm">How I built it.</h2>
+    <p class="intro">The arc from a screening deck to a tool a sponsor can re-run on any deal.</p>
+    <ol class="todo">
+      <li><b>Frame one decision.</b><span>“Which of these twelve deals do we buy?” reduced to three strategies priced on one yardstick — target-EBITDA units against the target's own DCF: buy, build in-house, partner in, or do nothing.</span></li>
+      <li><b>Source only public numbers, each tagged.</b><span>Twelve announced deal values from 8-Ks and 10-Ks (2015–2025), $0.33B to $16B, each with its source line. The EBITDA multiple is left <i>un-invented</i> — none of the twelve discloses a clean one, so the screen supplies its own multiples as decision inputs.</span></li>
+      <li><b>Model with closed forms first.</b><span>The buy-only boundary is one line of algebra, <code>m*(c) = (E·conv + S·c) / (ds·r)</code>, rising 10x to 16.7x as capture rises 0 to 100%. The IRR waterfall is an additive gate bridge — equity in, growth, multiple expansion — whose implied IRR matches the bisection solver to 1e-3.</span></li>
+      <li><b>Prove it, not just claim it.</b><span>38 offline pytest cases: closed-form-vs-numeric pins, a scale-invariance check (deal value never moves the IRR), a decay-consistency check, and a seeded input-prior bootstrap so every headline number ships with P10/P50/P90. Zero network, deterministic, one-command re-run.</span></li>
+      <li><b>Answer the hostile question.</b><span>The IRR is decomposed, not defended: in the expansion case 82% of the gate work is the multiple re-rating, and growth-only strips it to 9%. The synergy-decay boundary — accretive 5 of 5 years at 8x, 0 of 5 at 18x — is the answer to “when do you stop buying?”</span></li>
+      <li><b>Make it runnable and feelable.</b><span><code>python -m notebooks.run_notebook</code> regenerates <code>out/decision_numbers.json</code>; GitHub Actions runs the suite on every push; this page re-implements the same closed forms in JS and a Node harness pins the two languages to the same bits.</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- Defended -->
+<section class="chapter alt" id="defend">
+  <div class="wrap">
+    <h2 class="reveal">Three attacks, answered with a number.</h2>
+    <p class="intro">What I'd get asked in a strategy interview — and the defence that holds.</p>
+    <div class="qa">
+      <div class="card">
+        <p class="tag">Attack 1</p>
+        <h3>“Your screen uses multiples that don't exist publicly — defend the decision inputs.”</h3>
+        <p>They are <i>decision inputs</i>, not historical values: none of the twelve deals discloses a clean EBITDA multiple, so the screen supplies its own and the announced value sets capacity, not return — the IRR waterfall proves it, bit for bit, that a $16.0B deal and a $0.33B deal print identical gates at identical multiples.</p>
+      </div>
+      <div class="card">
+        <p class="tag">Attack 2</p>
+        <h3>“Is that IRR a real return, or a multiple assumption dressed up?”</h3>
+        <p>The waterfall decomposes it: in the 6x-in/12x-out expansion case, 82% of the gate work is the multiple re-rating — strip it (growth-only, 8x in / 8x out) and the edge is 9%. The distribution is reported, not just the point estimate, and the gate split is a number the client can re-run.</p>
+      </div>
+      <div class="card">
+        <p class="tag">Attack 3</p>
+        <h3>“How do you know when to stop buying?”</h3>
+        <p>The synergy-decay boundary: a deal is “accretive for N years, then inverts” — 5 of 5 at 8x, 3 of 5 at 14x, 0 of 5 at 18x — and the buy price cap is the point where the cheaper alternative overtakes: 12x for e-commerce, 16x for logistics. The trigger line a mandate quotes is a number, not a gut call.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sources -->
+<section class="chapter" id="sources">
+  <div class="wrap">
+    <h2 class="reveal sm">Sources — tagged, exactly as in <code>data/</code> and <code>decision/</code>.</h2>
+    <p class="intro">CONFIRMED is a filed figure. EST is our build on a public convention. <span class="uni">[unverified]</span> is a committee input — the client's to confirm.</p>
+    <div class="scrollx">
+      <table id="srcTable" class="plain">
+        <thead><tr><th>Figure</th><th class="n">Value</th><th class="n">Tag</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Twelve announced deal values</td><td class="n">$0.33B–$16B</td><td class="n"><span class="chip conf">CONFIRMED</span></td><td>8-K / 10-K announcements, 2015–2025; one line per deal in <code>data/deals.py</code></td></tr>
+          <tr><td>EBITDA multiples</td><td class="n">not disclosed</td><td class="n"><span class="chip unv">[unverified]</span></td><td>Deliberately un-invented: the screen's multiples are decision inputs, not filings</td></tr>
+          <tr><td>Screen base case</td><td class="n">10 EBITDA · 30% NI · 60% debt @ 5%</td><td class="n"><span class="chip est">EST</span></td><td>The committee's standardised 100-unit acquirer convention (<code>model/accretive.py</code>)</td></tr>
+          <tr><td>DCF shape of the value anchor</td><td class="n">5-yr · 5% CAGR · 2.5% terminal</td><td class="n"><span class="chip est">EST</span></td><td><code>model/sensitivity.py</code> — intrinsic multiple ≈ 19.8x at 8% WACC</td></tr>
+          <tr><td>Build CAPEX · partner rate card · value fractions · decay floors</td><td class="n">90/160 · $25/yr · 85%/70% · 40%/50%</td><td class="n"><span class="chip unv">[unverified]</span></td><td>Committee inputs per sector (e-commerce / logistics) — the tool's job is to isolate how much each is worth</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><a href="https://github.com/Vedantk910/ma-case-file">Vedantk910/ma-case-file</a></span>
+    <span><a href="https://github.com/Vedantk910/ma-case-file/blob/main/report/decision_page.md">One-page decision memo</a></span>
+    <span>Estimates for study, not investment advice. Rules as of 2026-11.</span>
+  </div>
+</footer>
+
+<script src="model.js?v=3"></script>
+<script src="app.js?v=3"></script>
+</body>
+</html>
