@@ -59,7 +59,7 @@ model/      # accretive.py, sensitivity.py, rollup.py
 decision/   # synergy_decay, surfaces, irr_waterfall, decision_page
 notebooks/  # model_full.ipynb + runner (one-command end-to-end, writes out/)
 report/     # case_file.md + decision_page.md
-tests/      # pytest suite (offline; 38 cases incl. the decision tool)
+tests/      # pytest suite (offline; 43 cases incl. the decision tool)
 ```
 
 ## Quick start
@@ -67,7 +67,7 @@ tests/      # pytest suite (offline; 38 cases incl. the decision tool)
 ```bash
 pip install -r requirements.txt
 python -m notebooks.run_notebook   # end-to-end, writes out/decision_numbers.json
-python -m pytest tests/ -q         # 38 offline tests
+python -m pytest tests/ -q         # 43 offline tests
 node site/verify.js                # the interactive site's JS pins match the Python baseline
 ```
 
@@ -88,11 +88,12 @@ number you can re-run.
 
 - **G0 scope** — one decision: which of the 12 deals do we buy, which do we
   build, which do we partner into?
-- **G1 build** — four `decision/` modules extending the three screens; seeded,
+- **G1 build** — five `decision/` modules extending the three screens; seeded,
   cache-first, offline.
-- **G2 test** — 29 new offline tests (38 total); each module has a
-  closed-form-vs-numeric pin, a scale-invariance check, and a decay-consistency
-  check.
+- **G2 test** — 34 new offline tests (43 total); each module has a
+  closed-form-vs-numeric pin, a scale-invariance check, a decay-consistency
+  check, and the inference layer is pinned for seeded determinism and
+  percentile ordering.
 - **G3 verify** — `python -m notebooks.run_notebook` regenerates
   `out/decision_numbers.json` with every quoted number; the EDGAR section reads
   the JSON cache.

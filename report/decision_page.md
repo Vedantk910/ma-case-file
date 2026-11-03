@@ -75,6 +75,27 @@ alternative overtakes buy:
 Same entry multiple, different sectors → different caps. That sector split, not
 the deal name, is what the page differentiates.
 
+## 5. The inference layer — distributions, not point estimates
+
+The numbers above are deterministic *given the committee's inputs*. The
+defensible question is the one over the inputs themselves: **what is the
+distribution of the headline number, and does the decision survive it?**
+`decision/inference.py` answers both, seeded and offline:
+
+- **Input-prior bootstrap** (n=2000, seed 0) resamples the committee bands
+  (capture 25–75%, CAGR 2–6%, exit multiple delta −1…+2x, leverage 3–5x,
+  capex and rate cards in realistic ranges). E-commerce: buy cap P10/P50/P90 =
+  **9.5 / 12.0 / 14.0x**; expansion-case IRR **3.4 / 14.2 / 25.5%**; logistics
+  buy cap **13.0 / 15.25 / 18.5x** (build capex is what pushes it up). The
+  point estimate is inside the band; the band is the claim.
+- **Prior-predictive "deflated" check** — under a zero-edge null (growth and
+  exit-delta as normal noise, leverage fixed), the best-of-3-scenario MOC at or
+  above the observed **5.30x** has mass **0.000**: the expansion-case MOC is not
+  input luck, it survives the 10% deflated bar.
+- **Scale invariance holds across the distribution** — two e-commerce deals
+  share the identical cap distribution (same for logistics), so the cap is a
+  sector property, not a deal property, all the way out to P90.
+
 ## What we would ask the client (carried from the case file)
 1. **Entry-multiple ceiling** — at what EV/EBITDA does the committee stop being
    accretive even at 100% capture; is that a tolerance or a hard cap?
