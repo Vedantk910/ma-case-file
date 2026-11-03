@@ -294,5 +294,75 @@ def test_recommend_none_when_every_option_is_negative():
     assert eco_expensive["strategies"]["buy"]["net_pv"] < 0.0
 
 
+# ---------------------------------------------------------------------------
+# inference
+# ---------------------------------------------------------------------------
+
+def test_bootstrap_is_seeded_deterministic():
+    import decision.inference as inf
+    d = deals.deals_by_sector("e-commerce")[0]
+    a = inf.input_bootstrap(d, n=50, seed=7)
+    b = inf.input_bootstrap(d, n=50, seed=7)
+    assert a == b, "same seed must reproduce the identical distribution"
+    c = inf.input_bootstrap(d, n=50, seed=8)
+    assert c["p50"] != a["p50"], "different seed, different resample"
+
+
+def test_bootstrap_percentile_ordering_and_bands():
+    import decision.inference as inf
+    d = deals.deals_by_sector("logistics")[0]
+    out = inf.input_bootstrap(d, n=200, seed=0)
+    for key in out["p50"]:
+        assert out["p10"][key] <= out["p50"][key] <= out["p90"][key], \
+            f"{key}: P10 must not exceed P50 or P90"
+    # the IRR evaluated at the band midpoints (the point estimate the note
+    # quotes) must sit inside the bootstrap IRR band - that is what a CI
+    # on the inputs is for
+    from decision import irr_waterfall
+    from decision.inference import INPUT_BANDS
+    lo_cagr, hi_cagr = INPUT_BANDS["cagr"]
+    lo_exit, hi_exit = INPUT_BANDS["exit_mult_delta"]
+    lo_lev, hi_lev = INPUT_BANDS["leverage"]
+    point = irr_waterfall.equity_multiple_bridge(
+        entry_multiple=6.0,
+        exit_multiple=6.0 + 0.5 * (lo_exit + hi_exit),
+        leverage=0.5 * (lo_lev + hi_lev),
+        ebitda_cagr=0.5 * (lo_cagr + hi_cagr))["implied_irr"]
+    assert out["p10"]["irr_expansion"] <= point <= out["p90"]["irr_expansion"]
+
+
+def test_bootstrap_buy_cap_is_sector_not_deal_scale():
+    import decision.inference as inf
+    # two deals in the same sector share the cap; the bootstrap must keep
+    # that scale invariance across the whole distribution, not just the
+    # point estimate
+    d1, d2 = deals.deals_by_sector("e-commerce")[:2]
+    out1 = inf.input_bootstrap(d1, n=100, seed=3)
+    out2 = inf.input_bootstrap(d2, n=100, seed=3)
+    for pctl in ("p10", "p50", "p90"):
+        assert out1[pctl]["buy_cap"] == out2[pctl]["buy_cap"], \
+            "same-sector deals must share the cap distribution"
+
+
+def test_prior_predictive_mass_bounds_and_deflated_flag():
+    import decision.inference as inf
+    res = inf.prior_predictive_irr(n=200, seed=11)
+    m = res["prior_predictive_mass"]
+    assert 0.0 <= m <= 1.0
+    # flag and mass must agree: survives iff mass < 0.10
+    assert res["deflated_survives_at_10pct"] == (m < 0.10)
+    # observed best MOC is the expansion case's point-estimate MOC
+    from decision import irr_waterfall
+    exp = irr_waterfall.equity_multiple_bridge(entry_multiple=6.0, exit_multiple=12.0)
+    assert res["observed_best_moc"] == round(exp["moc"], 4)
+
+
+def test_prior_predictive_is_seeded_deterministic():
+    import decision.inference as inf
+    a = inf.prior_predictive_irr(n=200, seed=5)
+    b = inf.prior_predictive_irr(n=200, seed=5)
+    assert a["prior_predictive_mass"] == b["prior_predictive_mass"]
+
+
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-v"]))
